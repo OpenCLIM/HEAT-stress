@@ -1,0 +1,123 @@
+api_version: v1beta1
+kind: Model
+metadata: 
+  description: "The Heat Extremes Analysis Toolbox for heat stress metrics (HEAT-stress) has been created for the OpenCLIM project, for integration of heatwave and related temperature and heat stress extremes analysis with other climate risk modelling. \n"
+  display_name: HEAT-metrics
+  name: heatmetrics
+  publisher: "University of Bristol"
+  source_code: "https://github.com/OpenCLIM/HEAT-stress"
+  summary: "OpenCLIM Heat Extremes Analysis Toolbox for heat stress metrics (HEAT-stress)"
+spec: 
+  inputs: 
+    parameters:
+      - 
+        name: EXPNAME
+        title: Experiment name
+        description: Experiment name for easier future identification of results
+        type: string
+        required: false
+      - 
+        name: METRIC
+        title: Heat stress metric name
+        description: The heat stress metric you want to calculate
+        type: string
+        options: 
+          - name: sWBGT
+            title: simplified Wet Bulb Globe Temperature
+          - name: Humidex
+            title: Humidex
+          - name: AppTemp
+            title: Apparent Temperature
+          - name: THI
+            title: Temperature Humidity Index
+        default: sWBGT
+        required: true
+      -
+        name: MAXMEANMIN
+        title: Daily max., mean or min.
+        description: Calculate for daily maximum, mean or minimum
+        type: string
+        options: 
+          - name: min
+            title: Daily minimum
+          - name: mean
+            title: Daily mean
+          - name: max
+            title: Daily maximum
+        default: mean
+        required: true
+      -
+        name: HUMIDITY
+        title: Humidity variable
+        description: Humidity variable used in the heat stress calculation
+        type: string
+        options: 
+          - name: VP
+            title: Vapour pressure (VP)
+          - name: DPT
+            title: Dew point temperature (DPT)
+          - name: RH
+            title: Relative humidity (RH)
+          - name: SH
+            title: Specific humidity (SH)
+        default: mean
+        required: true
+
+      -
+        name: TEMPNAME
+        title: Temperature variable name in netCDF
+        description: The name of the temperature variable in the input netCDF if not the default (tas, tasmax or tasmin)
+        type: string
+        required: false
+      -
+        name: HUMIDITYNAME
+        title: Humidity variable name in netCDF
+        description: The name of the humidity variable in the input netCDF if not a default name (VP, DPT, RH or SH)
+        type: string
+        required: false
+      -
+        name: TEMPALTNAME
+        title: Temperature variable name in netCDF for Vapour Pressure calculation
+        description: The name of the temperature variable in the input netCDF used for vapour pressure calculation if not the default (tas)
+        type: string
+        required: false
+      -
+        name: PRESSURENAME
+        title: Pressure variable name in netCDF for Vapour Pressure calculation
+        description: The name of the pressure variable in the input netCDF used for vapour pressure calculation if not the default (psl)
+        type: string
+        required: false
+
+    dataslots: 
+      - 
+        default: 
+          - 750e5aaa-d03c-49b2-a862-0d2446e0d9bd
+        description: "A dataslot that should contain netCDF temperature data"
+        name: Temperature
+        path: inputs/Temperature/
+        required: true
+      -
+        default:
+          - 7fedfc1e-7b95-449e-a846-f27b282e188c
+        description: "A dataslot that should contain netCDF humidity data"
+        name: Humidity
+        path: inputs/Humidity/
+        required: true
+      -
+        description: "An optional dataslot to include netCDF daily mean temperature for vapour pressure calculation"
+        name: TemperatureAlt
+        path: inputs/Temperature_alt/
+        required: false
+      - 
+        default: 
+          - 750e5aaa-d03c-49b2-a862-0d2446e0d9bd
+        description: "An optional dataslot to include netCDF daily mean pressure for vapour pressure calculation (either sea level pressure named psl, or surface pressure)"
+        name: Pressure
+        path: inputs/Pressure/
+        required: false
+      -
+        description: "An optional dataslot to include surface height data for converting sea level pressure to surface pressure"
+        name: Height
+        path: inputs/Height/
+        required: false
+
