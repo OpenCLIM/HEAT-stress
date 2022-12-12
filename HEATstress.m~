@@ -187,23 +187,21 @@ elseif strcmp(inputs.Humidity,'SH')
                 SH = double(ncread(file,inputs.HumidityName));
                 p = double(ncread(pfile,inputs.PresName));
                 if strcmp(inputs.PresName,'psl')
-                    ht = load('ht.mat');
-                    t = double(ncread(tfile,inputs.TempAltName));
-                    p = p_surf(p,t,ht);
-                end
-                VP = VapourPressure(SH,p);
+                    
+                ht = load('ht.mat');
+                t = double(ncread(tfile,inputs.TempAltName));
+                p = p_surf(p
+
+                VP = hurs2VP(SH,t);
             else
                 SH = double(ncread(file,inputs.HumidityName));
-                p = double(ncread(pfile,inputs.PresName));
-                if strcmp(inputs.PresName,'psl')
-                    ht = load('ht.mat');
-                    t = double(ncread(tfile,inputs.TempAltName));
-                    p = p_surf(p,t,ht);
-                end
-                VP = cat(3,VP,VapourPressure(SH,p));
+                t = double(ncread(tfile,inputs.TempAltName));
+                VP = cat(3,VP,hurs2VP(SH,t));
             end
+            
         end
     end
+    
 end
 
 
