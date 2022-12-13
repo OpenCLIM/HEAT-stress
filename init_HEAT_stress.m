@@ -8,21 +8,19 @@ root_dir = pwd;
 
 % Running locally on AKA's machine
 if length(root_dir) >= 14
-        % Set data directories
-        UKCP18dir = '/Volumes/DataDrive/UKCP18/';
-        ERA5dir = '/Volumes/DataDrive/ERA5/';
-        HadUKdir = '/Volumes/DataDrive/HadUK-Grid/v1.0.2.1/';
-        Deriveddir = '/Volumes/DataDrive/HEAToutput/DerivedData/';
-        Outputdir = '/Volumes/DataDrive/HEAToutput/';
-        
-        addpath('PhysicalCalculations/')
-        addpath('DataHandling/')
-        addpath('Processing/')
-        addpath('Outputting/')
-        addpath('PreProcessedData/')
-        addpath('Dependencies/')
-        
-        
+    % Set data directories
+    Inputdir = '/data/inputs/';
+    Tempdirin = '/Volumes/DataDrive/UKCP18/12km/tasmax/run04/';
+%     Tempdirin = '/Volumes/DataDrive/UKCP18/12km/tas/run04/';
+%     Tempdirin = '/Volumes/DataDrive/UKCP18/12km/tasmin/run04/';
+    TempAltdirin = '/Volumes/DataDrive/UKCP18/12km/tas/run04/';
+%     Humdirin = '/Volumes/DataDrive/UKCP18/12km/hurs/run04/';
+    Humdirin = '/Volumes/DataDrive/UKCP18/12km/huss/run04/';
+    Pressuredirin = '/Volumes/DataDrive/UKCP18/12km/psl/run04/';
+    Htdirin = '/Volumes/DataDrive/UKCP18/Height/';
+    
+    Climatedirout = '/Volumes/DataDrive/HEAToutput/DerivedData/';
+    
     
     % Otherwise, assume running on DAFNI (in a Docker container)
 else
@@ -34,7 +32,6 @@ else
     Pressuredirin = '/data/inputs/Pressure/';
     Htdirin = '/data/inputs/Height/';
     
-    BaseClimatedirin = '/data/inputs/ClimateBase/';
     Climatedirout = '/data/outputs/Climate/';
 
     % Note: in this case, 'addpath' should have been done before building
