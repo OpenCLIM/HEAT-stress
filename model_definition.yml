@@ -60,7 +60,7 @@ spec:
             title: Relative humidity (RH)
           - name: SH
             title: Specific humidity (SH)
-        default: mean
+        default: VP
         required: true
 
       -
@@ -98,7 +98,7 @@ spec:
         required: true
       -
         default:
-          - 7fedfc1e-7b95-449e-a846-f27b282e188c
+          - 750e5aaa-d03c-49b2-a862-0d2446e0d9bd
         description: "A dataslot that should contain netCDF humidity data"
         name: Humidity
         path: inputs/Humidity/
