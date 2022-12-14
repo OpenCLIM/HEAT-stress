@@ -96,7 +96,7 @@ if ~exist('inputs','var')
     env_tas1name = getenv('TEMPNAME');
     env_tas2name = getenv('TEMPALTNAME');
     env_pname = getenv('PRESSURENAME');
-    env_expname = getenv('EXPNAME');
+    env_expname = getenv('EXPNAME')
     
     if ~isempty(env_humname)
         inputs.HumidityName = string(env_humname);
@@ -129,7 +129,7 @@ if ~exist('inputs','var')
     end
     
     if ~isempty(env_expname)
-        inputs.ExptName = string(env_expname);
+        inputs.ExptName = string(env_expname)
     end
 end
 
@@ -139,6 +139,7 @@ if ~isfield(inputs,'ExptName')
     inputs.ExptName = 'Default';
 end
 
+test = [Climatedirout,inputs.ExptName]
 % Next, check if output directory already exists
 if ~exist([Climatedirout,inputs.ExptName],'dir')
     % Create output directory
