@@ -343,6 +343,11 @@ x = projection_x_coordinate;
 y = projection_y_coordinate;
 Variable = standard_name;
 
+% For debugging:
+size(x)
+size(y)
+size(data)
+
 % Create netCDF and derived variable
 nccreate(fname_long,Variable,'Dimensions',{'projection_x_coordinate',length(x),'projection_y_coordinate',length(y),'time',length(data(1,1,:))},'Datatype','double','Format','netcdf4_classic','DeflateLevel',2)
 ncwrite(fname_long,Variable,data);

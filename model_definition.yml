@@ -2,8 +2,8 @@ api_version: v1beta2
 kind: M
 metadata: 
   description: "The Heat Extremes Analysis Toolbox for heat stress metrics (HEAT-stress) has been created for the OpenCLIM project, for integration of heatwave and related temperature and heat stress extremes analysis with other climate risk modelling. \n"
-  display_name: HEAT-metrics
-  name: heatmetrics
+  display_name: HEAT-stress
+  name: heatstress
   publisher: "University of Bristol"
   source_code: "https://github.com/OpenCLIM/HEAT-stress"
   summary: "OpenCLIM Heat Extremes Analysis Toolbox for heat stress metrics (HEAT-stress)"
@@ -91,31 +91,35 @@ spec:
     dataslots: 
       - 
         default: 
-          - 750e5aaa-d03c-49b2-a862-0d2446e0d9bd
+          - 60cf23f9-b5b8-48c6-ae02-62facef23ec5
         description: "A dataslot that should contain netCDF temperature data"
         name: Temperature
         path: inputs/Temperature/
         required: true
       -
         default:
-          - 750e5aaa-d03c-49b2-a862-0d2446e0d9bd
+          - cca5bdd1-e480-42b9-834e-388f1901c89a
         description: "A dataslot that should contain netCDF humidity data"
         name: Humidity
         path: inputs/Humidity/
         required: true
       -
+        default: 
+          - 60cf23f9-b5b8-48c6-ae02-62facef23ec5
         description: "An optional dataslot to include netCDF daily mean temperature for vapour pressure calculation"
         name: TemperatureAlt
         path: inputs/Temperature_alt/
         required: false
       - 
         default: 
-          - 750e5aaa-d03c-49b2-a862-0d2446e0d9bd
+          - e1e450e2-28ef-4c1d-a11a-d7fa6e98b341
         description: "An optional dataslot to include netCDF daily mean pressure for vapour pressure calculation (either sea level pressure named psl, or surface pressure)"
         name: Pressure
         path: inputs/Pressure/
         required: false
       -
+        default: 
+          - 4a0ebada-7ffb-4d09-bd05-3dbe6b1c4ee8
         description: "An optional dataslot to include surface height data for converting sea level pressure to surface pressure"
         name: Height
         path: inputs/Height/
