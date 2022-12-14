@@ -341,8 +341,8 @@ end
 
 %% Save output
 % Create output directory/filename
-fname_long = [outdir,'/',inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc']
-fname = [inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc'];
+fname_long = strcat(outdir,'/',inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc')
+fname = strcat(inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc');
 
 % Load lat, long and time info for saving
 x = projection_x_coordinate;
