@@ -96,6 +96,7 @@ if ~exist('inputs','var')
     env_tas1name = getenv('TEMPNAME');
     env_tas2name = getenv('TEMPALTNAME');
     env_pname = getenv('PRESSURENAME');
+    env_expname = getenv('EXPNAME');
     
     if ~isempty(env_humname)
         inputs.HumidityName = string(env_humname);
@@ -125,6 +126,10 @@ if ~exist('inputs','var')
         inputs.PresName = string(env_pname);
     else
         inputs.PresName = 'psl'; % Default
+    end
+    
+    if ~isempty(env_expname)
+        inputs.ExptName = string(env_expname);
     end
 end
 
@@ -335,7 +340,7 @@ end
 
 %% Save output
 % Create output directory/filename
-fname_long = [Climatedirout,inputs.ExptName,'/',inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc'];
+fname_long = [Climatedirout,inputs.ExptName,'/',inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc']
 fname = [inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc'];
 
 % Load lat, long and time info for saving
