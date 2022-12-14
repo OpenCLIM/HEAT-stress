@@ -147,7 +147,7 @@ if ~exist(outdir,'dir')
 end
 
 % Save input files for future reference
-save([Climatedirout,inputs.ExptName,'/inputs.mat'],'inputs')
+save([outdir,'/inputs.mat'],'inputs')
 
 
 %% Calculate/load vapour pressure
@@ -341,7 +341,7 @@ end
 
 %% Save output
 % Create output directory/filename
-fname_long = [Climatedirout,inputs.ExptName,'/',inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc']
+fname_long = [outdir,'/',inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc']
 fname = [inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc'];
 
 % Load lat, long and time info for saving
