@@ -308,32 +308,32 @@ if strcmp(inputs.Metric,'sWBGT')
     data = SWBGTVP(T,VP);
 %     units = '°C';
     standard_name = 'sWBGT';
-    long_name = ['Daily ',inputs.MaxMeanMin,' simplified Wet Bulb Globe Temperature'];
-    description = ['Daily ',inputs.MaxMeanMin,' simplified Wet Bulb Globe Temperature'];
+    long_name = ['Daily ',char(inputs.MaxMeanMin),' simplified Wet Bulb Globe Temperature'];
+    description = ['Daily ',char(inputs.MaxMeanMin),' simplified Wet Bulb Globe Temperature'];
 %     label_units = '°C';
     plot_label = 'simplified WBGT';
 elseif strcmp(inputs.Metric,'Humidex')
     data = HumidexVP(T,VP);
 %     units = '°C';
     standard_name = 'Humidex';
-    long_name = ['Daily ',inputs.MaxMeanMin,' Humidex'];
-    description = ['Daily ',inputs.MaxMeanMin,' Humidex'];
+    long_name = ['Daily ',char(inputs.MaxMeanMin),' Humidex'];
+    description = ['Daily ',char(inputs.MaxMeanMin),' Humidex'];
 %     label_units = '°C';
     plot_label = 'Humidex';
 elseif strcmp(inputs.Metric,'AppTemp')
     data = AppTempVP(T,VP);
 %     units = '°C';
     standard_name = 'AppTemp';
-    long_name = ['Daily ',inputs.MaxMeanMin,' Apparent Temperature'];
-    description = ['Daily ',inputs.MaxMeanMin,' Apparent Temperature'];
+    long_name = ['Daily ',char(inputs.MaxMeanMin),' Apparent Temperature'];
+    description = ['Daily ',char(inputs.MaxMeanMin),' Apparent Temperature'];
 %     label_units = '°C';
     plot_label = 'Apparent Temperature';
 elseif strcmp(inputs.Metric,'THI')
     data = TempHumidityIndexVP(T,VP);
 %     units = '°C';
     standard_name = 'THI';
-    long_name = ['Daily ',inputs.MaxMeanMin,' Temperature Humidity Index'];
-    description = ['Daily ',inputs.MaxMeanMin,' Temperature Humidity Index'];
+    long_name = ['Daily ',char(inputs.MaxMeanMin),' Temperature Humidity Index'];
+    description = ['Daily ',char(inputs.MaxMeanMin),' Temperature Humidity Index'];
 %     label_units = '°C';
     plot_label = 'Temperature Humidity Index';
 end    
@@ -348,11 +348,6 @@ fname = strcat(inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:
 x = projection_x_coordinate;
 y = projection_y_coordinate;
 Variable = standard_name;
-
-% For debugging:
-size(x)
-size(y)
-size(data)
 
 % Create netCDF and derived variable
 nccreate(fname_long,Variable,'Dimensions',{'projection_x_coordinate',length(x),'projection_y_coordinate',length(y),'time',length(data(1,1,:))},'Datatype','double','Format','netcdf4_classic','DeflateLevel',2)
@@ -413,7 +408,7 @@ disp('-----')
 
 %% Finish up
 disp(' ')
-disp(['HEAT-stress run "',inputs.ExptName,'" complete',])
+disp(['HEAT-stress run "',char(inputs.ExptName),'" complete',])
 endt = now;
 fprintf('Total time taken to run: %s\n', datestr(endt-startt,'HH:MM:SS'))
 disp('-----')
