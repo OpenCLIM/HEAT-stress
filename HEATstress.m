@@ -139,11 +139,11 @@ if ~isfield(inputs,'ExptName')
     inputs.ExptName = 'Default';
 end
 
-test = [Climatedirout,inputs.ExptName]
+outdir = [char(Climatedirout),char(inputs.ExptName)]
 % Next, check if output directory already exists
-if ~exist([Climatedirout,inputs.ExptName],'dir')
+if ~exist(outdir,'dir')
     % Create output directory
-    mkdir([Climatedirout,inputs.ExptName])
+    mkdir(outdir)
 end
 
 % Save input files for future reference
