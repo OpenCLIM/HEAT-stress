@@ -97,6 +97,12 @@ if ~exist('inputs','var')
     env_tas2name = getenv('TEMPALTNAME');
     env_pname = getenv('PRESSURENAME');
     env_expname = getenv('EXPNAME')
+    env_xname = getenv('XNAME');
+    env_yname = getenv('YNAME');
+    env_datename = getenv('DATENAME');
+    env_timename = getenv('TIMENAME');
+    env_ukcp18 = getenv('UKCP18');
+
     
     if ~isempty(env_humname)
         inputs.HumidityName = string(env_humname);
@@ -131,6 +137,41 @@ if ~exist('inputs','var')
     if ~isempty(env_expname)
         inputs.ExptName = string(env_expname)
     end
+    
+    % General info for loading netCDF dimensions
+    if ~isempty(env_xname)
+        xname = char(env_xname);
+    else
+        xname = 'projection_x_coordinate'; % Default for UKCP18
+    end
+    
+    if ~isempty(env_yname)
+        yname = char(env_yname);
+    else
+        yname = 'projection_y_coordinate'; % Default for UKCP18
+    end
+    
+    if ~isempty(env_timename)
+        timename = char(env_timename);
+    else
+        inputs.PresName = 'time'; % Default for UKCP18
+    end
+    
+    if ~isempty(env_datename)
+        datename = string(env_datename);
+    else
+        datename = 'yyyymmdd'; % Default for UKCP18
+    end
+    
+    
+    if ~isempty(env_ukcp18)
+         if strcmp(string(env_ukcp18),'UKCP18')
+            inputs.UKCP18 = 1; % Default
+         elseif strcmp(string(env_ukcp18),'Other')
+            inputs.UKCP18 = 0;
+         end
+        % To do: add option for ERA5?
+    end
 end
 
 
@@ -139,7 +180,13 @@ if ~isfield(inputs,'ExptName')
     inputs.ExptName = 'Default';
 end
 
-outdir = [char(Climatedirout),char(inputs.ExptName)]
+% If running locally, create a sub-folder for output with ExptName
+if length(root_dir) >= 14
+    outdir = [char(Climatedirout),char(inputs.ExptName)]
+else % If running in Docker, save direct to output directory
+    outdir = Climatedirout
+end
+        
 % Next, check if output directory already exists
 if ~exist(outdir,'dir')
     % Create output directory
@@ -290,14 +337,14 @@ if ~isempty(files)
         % Load temperature for the correct region and concatenate through time if necessary
         if f == 1
             T = ncread(file,inputs.TempName);
-            dates = ncread(file,'yyyymmdd');
-            times = ncread(file,'time');
-            projection_x_coordinate = ncread(file,'projection_x_coordinate');
-            projection_y_coordinate = ncread(file,'projection_y_coordinate');
+            dates = ncread(file,datename);
+            times = ncread(file,timename);
+            x = ncread(file,xname);
+            y = ncread(file,yname);
         else
             T = cat(3,T,ncread(file,inputs.TempName));
-            dates = cat(2,dates,ncread(file,'yyyymmdd'));
-            times = cat(1,times,ncread(file,'time'));
+            dates = cat(2,dates,ncread(file,datename));
+            times = cat(1,times,ncread(file,timename));
         end
     end
 end
@@ -307,7 +354,7 @@ end
 if strcmp(inputs.Metric,'sWBGT')
     data = SWBGTVP(T,VP);
 %     units = '°C';
-    standard_name = 'sWBGT';
+    Variable = 'sWBGT';
     long_name = ['Daily ',char(inputs.MaxMeanMin),' simplified Wet Bulb Globe Temperature'];
     description = ['Daily ',char(inputs.MaxMeanMin),' simplified Wet Bulb Globe Temperature'];
 %     label_units = '°C';
@@ -315,7 +362,7 @@ if strcmp(inputs.Metric,'sWBGT')
 elseif strcmp(inputs.Metric,'Humidex')
     data = HumidexVP(T,VP);
 %     units = '°C';
-    standard_name = 'Humidex';
+    Variable = 'Humidex';
     long_name = ['Daily ',char(inputs.MaxMeanMin),' Humidex'];
     description = ['Daily ',char(inputs.MaxMeanMin),' Humidex'];
 %     label_units = '°C';
@@ -323,7 +370,7 @@ elseif strcmp(inputs.Metric,'Humidex')
 elseif strcmp(inputs.Metric,'AppTemp')
     data = AppTempVP(T,VP);
 %     units = '°C';
-    standard_name = 'AppTemp';
+    Variable = 'AppTemp';
     long_name = ['Daily ',char(inputs.MaxMeanMin),' Apparent Temperature'];
     description = ['Daily ',char(inputs.MaxMeanMin),' Apparent Temperature'];
 %     label_units = '°C';
@@ -331,7 +378,7 @@ elseif strcmp(inputs.Metric,'AppTemp')
 elseif strcmp(inputs.Metric,'THI')
     data = TempHumidityIndexVP(T,VP);
 %     units = '°C';
-    standard_name = 'THI';
+    Variable = 'THI';
     long_name = ['Daily ',char(inputs.MaxMeanMin),' Temperature Humidity Index'];
     description = ['Daily ',char(inputs.MaxMeanMin),' Temperature Humidity Index'];
 %     label_units = '°C';
@@ -341,40 +388,28 @@ end
 
 %% Save output
 % Create output directory/filename
-fname_long = strcat(outdir,'/',inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc')
-fname = strcat(inputs.ExptName,'_',standard_name,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc');
-
-% Load lat, long and time info for saving
-x = projection_x_coordinate;
-y = projection_y_coordinate;
-Variable = standard_name;
+fname_long = strcat(outdir,'/',inputs.ExptName,'_',Variable,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc')
+fname = strcat(inputs.ExptName,'_',Variable,inputs.MaxMeanMin,'_',(dates(1:8,1)'),'-',(dates(1:8,end)'),'.nc');
 
 % Create netCDF and derived variable
 nccreate(fname_long,Variable,'Dimensions',{'projection_x_coordinate',length(x),'projection_y_coordinate',length(y),'time',length(data(1,1,:))},'Datatype','double','Format','netcdf4_classic','DeflateLevel',2)
 ncwrite(fname_long,Variable,data);
-ncwriteatt(fname_long,Variable,'standard_name',standard_name);
+ncwriteatt(fname_long,Variable,'standard_name',Variable);
 ncwriteatt(fname_long,Variable,'long_name',long_name);
 % ncwriteatt(fname_long,Variable,'units',units);
 ncwriteatt(fname_long,Variable,'description',description);
 % ncwriteatt(fname_long,Variable,'label_units',label_units);
 ncwriteatt(fname_long,Variable,'plot_label',plot_label);
-ncwriteatt(fname_long,Variable,'grid_mapping','transverse_mercator');
 ncwriteatt(fname_long,Variable,'coordinates','ensemble_member_id latitude longitude month_number year yyyymmdd');
 ncwriteatt(fname_long,Variable,'missing_value',-9999);
 
 % Add lat and long data
 nccreate(fname_long,'projection_x_coordinate','Dimensions',{'projection_x_coordinate',length(x)},'Datatype','single','Format','netcdf4_classic','DeflateLevel',2)
 ncwrite(fname_long,'projection_x_coordinate',x);
-ncwriteatt(fname_long,'projection_x_coordinate','standard_name','easting');
-ncwriteatt(fname_long,'projection_x_coordinate','long_name','easting');
-ncwriteatt(fname_long,'projection_x_coordinate','units','m');
 ncwriteatt(fname_long,'projection_x_coordinate','axis','X');
 
 nccreate(fname_long,'projection_y_coordinate','Dimensions',{'projection_y_coordinate',length(y)},'Datatype','single','Format','netcdf4_classic','DeflateLevel',2)
 ncwrite(fname_long,'projection_y_coordinate',y);
-ncwriteatt(fname_long,'projection_y_coordinate','standard_name','northing');
-ncwriteatt(fname_long,'projection_y_coordinate','long_name','northing');
-ncwriteatt(fname_long,'projection_y_coordinate','units','m');
 ncwriteatt(fname_long,'projection_y_coordinate','axis','Y');
 
 % Add time and date data
@@ -386,8 +421,6 @@ ncwriteatt(fname_long,'projection_y_coordinate','axis','Y');
 nccreate(fname_long,'time','Dimensions',{'time',length(data(1,1,:))},'Datatype','single','Format','netcdf4_classic','DeflateLevel',2)
 ncwrite(fname_long,'time',times);
 ncwriteatt(fname_long,'time','standard_name','time');
-ncwriteatt(fname_long,'time','units','hours since 1970-01-01 00:00:00');
-ncwriteatt(fname_long,'time','calendar','365_day');
 ncwriteatt(fname_long,'time','axis','T');
 
 nccreate(fname_long,'yyyymmdd','Dimensions',{'time',length(data(1,1,:)),'string64',64},'Datatype','char')
@@ -403,8 +436,27 @@ ncwriteatt(fname_long,'/','title','HEAT-stress output')
 ncwriteatt(fname_long,'/','version','HEAT-stress v1.0')
 
 
-disp(['Saving of ',fname,' complete'])
+% Add meta data if same format as UKCP18 data
+if inputs.UKCP18 == 1
+    ncwriteatt(fname_long,Variable,'grid_mapping','transverse_mercator');
+    
+    ncwriteatt(fname_long,'projection_x_coordinate','standard_name','easting');
+    ncwriteatt(fname_long,'projection_x_coordinate','long_name','easting');
+    ncwriteatt(fname_long,'projection_x_coordinate','units','m');
+    
+    ncwriteatt(fname_long,'projection_y_coordinate','standard_name','northing');
+    ncwriteatt(fname_long,'projection_y_coordinate','long_name','northing');
+    ncwriteatt(fname_long,'projection_y_coordinate','units','m');
+    
+    ncwriteatt(fname_long,'time','units','hours since 1970-01-01 00:00:00');
+%     ncwriteatt(fname_long,'time','calendar','365_day');
+end
+
+% To do: add option for ERA5?
+
+disp(['Saving of ',char(fname),' complete'])
 disp('-----')
+
 
 %% Finish up
 disp(' ')

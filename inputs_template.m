@@ -6,3 +6,4 @@ inputs.HumidityName = 'huss';
 inputs.TempName = 'tasmax';
 inputs.TempAltName = 'tas';
 inputs.PresName = 'psl';
+inputs.UKCP18 = 1;

@@ -87,6 +87,43 @@ spec:
         description: The name of the pressure variable in the input netCDF used for vapour pressure calculation if not the default (psl)
         type: string
         required: false
+      -
+        name: XNAME
+        title: x coordinate variable name in netCDF
+        description: The name of the variable in the input netCDF if not the default (projection_x_coordinate)
+        type: string
+        required: false
+      -
+        name: YNAME
+        title: y coordinate variable name in netCDF
+        description: The name of the variable in the input netCDF if not the default (projection_y_coordinate)
+        type: string
+        required: false
+      -
+        name: TIMENAME
+        title: Time variable name in netCDF for z dimension
+        description: The name of the variable in the input netCDF if not the default (time)
+        type: string
+        required: false
+      -
+        name: DATENAME
+        title: Date info variable name in netCDF
+        description: The name of the variable in the input netCDF if not the default (yyyymmdd)
+        type: string
+        required: false
+      -
+        name: UKCP18
+        title: Data projection/format
+        description: Select if input data is on standard UKCP18 12km grid for UK for adding meta data to output netCDF
+        type: string
+        options: 
+          - name: UKCP18
+            title: Standard format UKCP18 12km data for UK
+          - name: Other
+            title: Other latitude, longitude, projection and/or time step from UKCP18
+        default: UKCP18
+        required: true
+
 
     dataslots: 
       - 
