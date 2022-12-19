@@ -154,7 +154,7 @@ if ~exist('inputs','var')
     if ~isempty(env_timename)
         timename = char(env_timename);
     else
-        inputs.PresName = 'time'; % Default for UKCP18
+        timename = 'time'; % Default for UKCP18
     end
     
     if ~isempty(env_datename)
@@ -334,6 +334,7 @@ end
 
 
 %% Load temperature file
+disp('Loading temperature data...')
 % Find temperature files:
 froot = Tempdirin; % Take the file name...
 files = dir([froot '*.nc']); % Then check if any files exist with this root
