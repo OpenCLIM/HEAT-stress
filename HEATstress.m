@@ -96,7 +96,7 @@ if ~exist('inputs','var')
     env_tas1name = getenv('TEMPNAME');
     env_tas2name = getenv('TEMPALTNAME');
     env_pname = getenv('PRESSURENAME');
-    env_expname = getenv('EXPNAME')
+    env_expname = getenv('EXPNAME');
     env_xname = getenv('XNAME');
     env_yname = getenv('YNAME');
     env_datename = getenv('DATENAME');
@@ -302,6 +302,10 @@ elseif strcmp(inputs.Humidity,'SH')
             if f == 1
                 SH = double(ncread(file,inputs.HumidityName));
                 p = double(ncread(pfile,inputs.PresName));
+                % If pressure is in Pa, convert to hPa
+                if nanmean(nanmean(nanmean(p)))>2000 
+                    p = p/100;
+                end
                 % If pressure is sea level pressure, it must be converted
                 % to surface pressure, requiring surface height to be
                 % loaded
@@ -314,6 +318,10 @@ elseif strcmp(inputs.Humidity,'SH')
             else
                 SH = double(ncread(file,inputs.HumidityName));
                 p = double(ncread(pfile,inputs.PresName));
+                % If pressure is in Pa, convert to hPa
+                if nanmean(nanmean(nanmean(p)))>2000 
+                    p = p/100;
+                end
                 if strcmp(inputs.PresName,'psl')
                     t = double(ncread(tfile,inputs.TempAltName));
                     p = p_surf(p,t,ht); % Convert to surface pressure
