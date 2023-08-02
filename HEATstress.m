@@ -1,5 +1,5 @@
 function [] = HEATstress(inputs)
-% HEAT-stress v.1.0
+% HEAT-stress v.2.0
 %
 % Run the OpenCLIM Heat Extremes Analysis Toolbox (HEAT) for calculating
 % heat stress metrics. Climate data in netCDF format is converted to one of
@@ -24,7 +24,7 @@ function [] = HEATstress(inputs)
 % temperature to vapour pressure. Conversion of relative humidity to vapour
 % pressure requires daily mean temperature to be provided. Conversion of
 % specific humidity requires daily mean temperature and daily mean surface
-% pressure to be provided. Althernatively, sea level pressure can pre
+% pressure to be provided. Alternatively, sea level pressure can be
 % provided along with a file showing surface height at each grid cell
 % (named ht.csv) and the conversion of sea level pressure to surface
 % pressure will be carried out.
@@ -49,12 +49,12 @@ function [] = HEATstress(inputs)
 % 
 % 'inputs' is an optional structure for running locally.
 %
-% Coded by A.T. Kennedy-Asser, University of Bristol, 2022.
+% Coded by A.T. Kennedy-Asser, University of Bristol, 2023.
 % Contact: alan.kennedy@bristol.ac.uk
 %
 
 %% Initialise
-disp('Running HEAT-stress v.1.0')
+disp('Running HEAT-stress v.2.0')
 disp('-----')
 
 % Set directory paths
@@ -347,16 +347,40 @@ if ~isempty(files)
         if f == 1
             T = ncread(file,inputs.TempName);
             dates = ncread(file,datename);
+            
+            % Some netCDFs have this saved in different orientation (e.g.
+            % bias corrected data vs UKCP18 raw). Figure out which way it
+            % is oriented to concatenate appropriately:
+            s2 = size(dates);
+            if s2(1) > s2(2)
+                datedim = 1;
+            else
+                datedim = 2;
+            end
             times = ncread(file,timename);
             x = ncread(file,xname);
             y = ncread(file,yname);
         else
             T = cat(3,T,ncread(file,inputs.TempName));
-            dates = cat(2,dates,ncread(file,datename));
+            dates = cat(datedim,dates,ncread(file,datename));
             times = cat(1,times,ncread(file,timename));
         end
     end
 end
+
+if datedim == 1
+    dates = dates';
+end
+
+dates2 = dates';
+% Correct the date stamp
+y1 = str2double(string(dates2(:,1:4)));
+m1 = str2double(string(dates2(:,5:6)));
+d1 = str2double(string(dates2(:,7:8)));
+ts1 = datetime(y1,m1,d1);
+ts2 = datetime(1970,01,01);
+times2 = hours(ts1 - ts2);
+times = times2;
 
 
 %% Calculate heat stress metric
@@ -412,15 +436,6 @@ ncwriteatt(fname_long,Variable,'plot_label',plot_label);
 ncwriteatt(fname_long,Variable,'coordinates','ensemble_member_id latitude longitude month_number year yyyymmdd');
 ncwriteatt(fname_long,Variable,'missing_value',-9999);
 
-% Add lat and long data
-nccreate(fname_long,'projection_x_coordinate','Dimensions',{'projection_x_coordinate',length(x)},'Datatype','single','Format','netcdf4_classic','DeflateLevel',2)
-ncwrite(fname_long,'projection_x_coordinate',x);
-ncwriteatt(fname_long,'projection_x_coordinate','axis','X');
-
-nccreate(fname_long,'projection_y_coordinate','Dimensions',{'projection_y_coordinate',length(y)},'Datatype','single','Format','netcdf4_classic','DeflateLevel',2)
-ncwrite(fname_long,'projection_y_coordinate',y);
-ncwriteatt(fname_long,'projection_y_coordinate','axis','Y');
-
 % Add time and date data
 % Some attributes are easier to read from template than to define
 % manually as they change between simulations
@@ -436,6 +451,15 @@ nccreate(fname_long,'yyyymmdd','Dimensions',{'time',length(data(1,1,:)),'string6
 ncwrite(fname_long,'yyyymmdd',dates');
 ncwriteatt(fname_long,'yyyymmdd','long_name','yyyymmdd');
 ncwriteatt(fname_long,'yyyymmdd','units','1');
+
+% Add lat and long data
+nccreate(fname_long,'projection_x_coordinate','Dimensions',{'projection_x_coordinate',length(x)},'Datatype','single','Format','netcdf4_classic','DeflateLevel',2)
+ncwrite(fname_long,'projection_x_coordinate',x);
+ncwriteatt(fname_long,'projection_x_coordinate','axis','X');
+
+nccreate(fname_long,'projection_y_coordinate','Dimensions',{'projection_y_coordinate',length(y)},'Datatype','single','Format','netcdf4_classic','DeflateLevel',2)
+ncwrite(fname_long,'projection_y_coordinate',y);
+ncwriteatt(fname_long,'projection_y_coordinate','axis','Y');
 
 % Write some general attributes
 ncwriteatt(fname_long,'/','collection','HEAT-stress derived heat stress metric')
